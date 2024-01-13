@@ -13,18 +13,21 @@
             <td>Price</td>
             <td></td>
         </tr>
+    </thead>
+    <tbody>
 
-        <tbody>
-            @foreach(var product in _products)
-            {
-                <tr>
+        @foreach (var product in _products)
+        {
+            <tr>
                 <td>@product.Id</td>
                 <td>@product.Title</td>
-                <td>R$@product.Price</td>
-                </tr>
-            }
-        </tbody>
-    </thead>
+                <td>@product.Price.ToString("C", new CultureInfo("pt-BR"))</td>
+                <td><a href="/products/edit/@product.Id"><Button Color="ButtonColor.Warning">Edit</Button></a><a href="/products/delete/@product.Id"><Button Color="ButtonColor.Danger">Delete</Button></a></td>
+            </tr>
+        }
+
+    </tbody>
+
 </table>
 
 @code {
