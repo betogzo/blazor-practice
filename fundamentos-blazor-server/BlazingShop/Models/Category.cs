@@ -1,21 +1,18 @@
-﻿namespace BlazingShop.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BlazingShop.Models
 {
     public class Category
     {
-        public Category()
-        {
-            
-        }
-
-        public Category(int id, string name, string description)
-        {
-            Id = id;
-            Name = name;
-            Description = description;
-        }
-
+        [Key]
+        [Required(ErrorMessage = "O ID da Categoria é obrigatório.")]
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+
+        [Required(ErrorMessage = "O título da Categoria é obrigatório.")]
+        [MinLength(5, ErrorMessage = "O título da Categoria deve conter no mínimo 5 caracteres.")]
+        [MaxLength(50, ErrorMessage = "O título da Categoria deve conter no máximo 50 caracteres.")]
+        public string Title { get; set; } = string.Empty;
+
+        public List<Product> Products { get; set; } = new();
     }
 }
