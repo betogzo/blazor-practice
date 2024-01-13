@@ -1,5 +1,6 @@
 ﻿@page "/products"
 @inject AppDbContext _dataContext
+@inject NavigationManager _navigationManager
 
 <h1>Products</h1>
 
@@ -12,6 +13,7 @@
             <td>Title</td>
             <td>Price</td>
             <td></td>
+            <td></td>
         </tr>
     </thead>
     <tbody>
@@ -22,7 +24,15 @@
                 <td>@product.Id</td>
                 <td>@product.Title</td>
                 <td>@product.Price.ToString("C", new CultureInfo("pt-BR"))</td>
-                <td><a href="/products/edit/@product.Id"><Button Color="ButtonColor.Warning">Edit</Button></a><a href="/products/delete/@product.Id"><Button Color="ButtonColor.Danger">Delete</Button></a></td>
+                <td><a href="/products/edit/@product.Id"><Button Color="ButtonColor.Warning">Edit</Button></a> <a><Button @onclick="ShowPop" Color=" ButtonColor.Danger">Delete</Button></a></td>
+                @if (Show)
+                {
+                    <td class="popconfirm">
+                        @Message
+                        <button type="button" class="btn btn-warning" @onclick="() => Confirmation(false, product.Id)">No</button>
+                        <button type="button" class="btn btn-primary" @onclick="() => Confirmation(true, product.Id)">Yes</button>
+                    </td>
+                }
             </tr>
         }
 
@@ -36,5 +46,33 @@
     protected override async Task OnInitializedAsync()
     {
         _products = await _dataContext.Products.AsNoTracking().ToListAsync();
+    }
+
+
+    public bool Show { get; set; }
+    [Parameter] public string Message { get; set; } = "Are you sure?";
+    [Parameter] public EventCallback<bool> ConfirmedChanged { get; set; }
+
+    public async Task Confirmation(bool value, int id)
+    {
+        if (value)
+        {
+            var prod = await _dataContext.Products.FirstOrDefaultAsync(x => x.Id == id);
+            _dataContext.Products.Remove(prod);
+            await _dataContext.SaveChangesAsync();
+
+            // refresh na pagina para refletir a alteração na lista
+            // pesquisar como usar o binding pra isso se possível
+            // para evitar ter que carregar a lista toda novamente no refresh
+            _navigationManager.Refresh();
+        }
+
+        Show = false;
+        await ConfirmedChanged.InvokeAsync(value);
+    }
+
+    public void ShowPop()
+    {
+        Show = true;
     }
 }
