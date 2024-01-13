@@ -11,6 +11,8 @@ string connectionString = builder.Configuration.GetConnectionString("DefaultConn
 
 builder.Services.AddDbContext<AppDbContext>(x => x.UseSqlServer(connectionString));
 
+builder.Services.AddBlazorBootstrap();
+
 var app = builder.Build();
 
 

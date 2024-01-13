@@ -6,6 +6,7 @@ namespace BlazingShop.Models
     {
         [Key]
         [Required(ErrorMessage = "O ID da Categoria é obrigatório.")]
+        [Range(1, int.MaxValue, ErrorMessage = "Selecione uma categoria válida.")]
         public int Id { get; set; }
 
         [Required(ErrorMessage = "O título da Categoria é obrigatório.")]
