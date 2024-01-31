@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using BlazorShop.Components;
 using BlazorShop.Components.Account;
 using BlazorShop.Data;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
