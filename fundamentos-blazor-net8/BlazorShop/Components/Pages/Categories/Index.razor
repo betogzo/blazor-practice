@@ -1,0 +1,36 @@
+﻿@page "/categories"
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext _context
+
+<h1>Categories</h1>
+
+<a class="mb-3" href="/categories/create">Create Category</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <td>#</td>
+            <td>Title</td>
+        </tr>
+    </thead>
+    <tbody>
+
+
+        @foreach (var category in _categories)
+        {
+            <tr>
+                <td>@category.Id</td>
+                <td>@category.Title</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    public IEnumerable<Category> _categories { get; set; } = Enumerable.Empty<Category>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _categories = await _context.Categories.ToListAsync();
+    }
+}
