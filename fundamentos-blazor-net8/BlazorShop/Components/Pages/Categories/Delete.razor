@@ -1,0 +1,44 @@
+﻿@page "/categories/delete/{id:int}"
+@inject ApplicationDbContext _context
+@inject NavigationManager _navigationManager
+@rendermode InteractiveServer
+
+@if (_category is null)
+{
+    <h1>Delete category</h1>
+    <p>Category not found!</p>
+}
+else
+{
+    <h1>Delete category "@_category.Title"</h1>
+
+    <EditForm Model="@_category" OnValidSubmit="DeleteCategoryAsync">
+        <div class="mb-3">
+            <label for="Title" class="form-label">Category title:</label>
+            <InputText id="Title" class="form-control" type="text" @bind-Value="_category.Title" readonly></InputText>
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-danger">Delete category</button>
+            <a href="/categories">Cancel</a>
+        </div>
+    </EditForm>
+}
+
+@code {
+    public Category? _category = new();
+    [Parameter] public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == Id);
+    }
+
+    protected async void DeleteCategoryAsync()
+    {
+        if (_category is null) return;
+        _context.Categories.Remove(_category);
+        await _context.SaveChangesAsync();
+        _navigationManager.NavigateTo("/categories");
+    }
+}
