@@ -1,0 +1,44 @@
+﻿@page "/products/delete/{id:int}"
+@inject ApplicationDbContext _context
+@inject NavigationManager _navigationManager
+@rendermode InteractiveServer
+
+@if (_product is null)
+{
+    <h1>Delete Product</h1>
+    <p class="text-center"><em>Product not found or server failed to retrieve its information.</em></p>
+}
+else
+{
+    <h1>Delete product "@_product.Title"</h1>
+
+    <EditForm Model="@_product" OnValidSubmit="DeleteProductAsync">
+        <div class="mb-3">
+            <label for="Title" class="form-label">Product title:</label>
+            <InputText id="Title" class="form-control" type="text" @bind-Value="_product.Title" readonly></InputText>
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-danger">Delete product</button>
+            <a href="/product">Cancel</a>
+        </div>
+    </EditForm>
+}
+
+@code {
+    public Product? _product = new();
+    [Parameter] public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _product = await _context.Products.FirstOrDefaultAsync(x => x.Id == Id);
+    }
+
+    protected async void DeleteProductAsync()
+    {
+        if (_product is null) return;
+        _context.Products.Remove(_product);
+        await _context.SaveChangesAsync();
+        _navigationManager.NavigateTo("/products");
+    }
+}

@@ -1,0 +1,54 @@
+﻿@page "/products"
+@inject ApplicationDbContext _context
+@attribute [StreamRendering(true)]
+@inject NavigationManager _navigationManager
+
+<h1>Products</h1>
+
+<Button class="mb-5" Type="ButtonType.Link" Color="ButtonColor.Primary" To="/products/create">New product</Button>
+
+@if (!_products.Any())
+{
+    <p class="text-center">
+        <em>Loading products...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <td>#</td>
+                <td>Title</td>
+                <td>Price</td>
+                <td>Category</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var product in _products)
+            {
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Title</td>
+                    <td>@product.Price.ToString("C", new CultureInfo("pt-BR"))</td>
+                    <td>@product.Category.Title</td>
+                    <td>
+                        <a href="/products/edit/@product.Id"><Button Color="ButtonColor.Warning">Edit</Button></a>
+                        <a href="/products/delete/@product.Id"><Button Color="ButtonColor.Danger">Delete</Button></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public IEnumerable<Product> _products { get; set; } = Enumerable.Empty<Product>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _products = await _context.Products.AsNoTracking().Include(product => product.Category).ToListAsync();
+    }
+}

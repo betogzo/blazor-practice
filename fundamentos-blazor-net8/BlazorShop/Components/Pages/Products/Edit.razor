@@ -1,0 +1,73 @@
+﻿@page "/products/edit/{id:int}"
+@inject ApplicationDbContext Context
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
+@if (Model is null)
+{
+    <h1>Edit product</h1>
+    <p class="text-center"><em>Product not found or server failed to retrieve its information.</em></p>
+} else
+{
+    <h1>Edit Product "@Model.Title"</h1>
+
+    <EditForm Model="@Model" OnValidSubmit="@SaveChangesAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">New product title:</label>
+            <InputText @bind-Value="Model.Title" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">New product description:</label>
+            <InputText @bind-Value="Model.Description" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Price" class="form-label">Price</label>
+            <InputNumber class="form-control" type="number" id="Price" @bind-Value="Model.Price" />
+        </div>
+
+        <div class="mb-3">
+            <label for="CategoryId" class="form-label">New product category:</label>
+            <InputSelect id="CategoryId" @bind-Value="Model.CategoryId" class="form-control">
+                @if (!Categories.Any())
+                {
+                    <option>No categories were found!</option>
+                }
+                else
+                {
+                    @foreach (var category in Categories)
+                    {
+                        <option value="@category.Id">@category.Title</option>
+                    }
+                }
+            </InputSelect>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="/products">Cancel</a>
+    </EditForm>
+}
+
+@code {
+    public Product Model { get; set; } = new();
+    public IEnumerable<Category> Categories { get; set; } = Enumerable.Empty<Category>();
+    [Parameter] public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await Context.Products.FirstAsync(product => product.Id == Id);
+        Categories = await Context.Categories.AsNoTracking().OrderBy(category => category.Title).ToListAsync();
+    }
+
+    protected async Task SaveChangesAsync()
+    {
+        if (Model is null) return;
+        Context.Products.Update(Model);
+        await Context.SaveChangesAsync();
+        NavManager.NavigateTo("/products");
+    }
+}
