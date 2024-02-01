@@ -2,6 +2,7 @@
 @inject ApplicationDbContext _context
 @inject NavigationManager _navigationManager
 @rendermode InteractiveServer
+@attribute [Authorize(Roles = "admin")]
 
 @if (_product is null)
 {
